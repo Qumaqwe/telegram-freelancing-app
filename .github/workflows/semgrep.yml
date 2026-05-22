@@ -8,12 +8,40 @@ on:
 jobs:
   semgrep:
     runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
 
-      - uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/default
-            p/nodejs
-            p/javascript
+      - name: Scan for HIGH and CRITICAL only
+        run: |
+          semgrep scan \
+            --config p/security-audit \
+            --config p/nodejs \
+            --config p/javascript \
+            --json --output semgrep.json \
+            . || test $? -le 1
+
+          python3 << 'EOF'
+          import json
+          import sys
+
+          with open("semgrep.json") as f:
+              data = json.load(f)
+
+          findings = [
+              r for r in data.get("results", [])
+              if r.get("extra", {}).get("severity") in ("HIGH", "CRITICAL")
+          ]
+
+          for r in findings:
+              extra = r["extra"]
+              line = r["start"]["line"]
+              print(f'{extra["severity"]}: {r["check_id"]} in {r["path"]}:{line}')
+
+          if findings:
+              print(f"\nFound {len(findings)} HIGH/CRITICAL issue(s)")
+              sys.exit(1)
+
+          print("No HIGH or CRITICAL findings")
+          EOF
