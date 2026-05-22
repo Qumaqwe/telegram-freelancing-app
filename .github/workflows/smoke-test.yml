@@ -1,22 +1,27 @@
 name: Production Smoke Test
 
 on:
-  schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
       - name: Check Vercel frontend
+        env:
+          VERCEL_APP_URL: ${{ secrets.VERCEL_APP_URL }}
         run: |
-          URL="${{ secrets.VERCEL_APP_URL }}"
+          if [ -z "$VERCEL_APP_URL" ]; then
+            echo "Error: secret VERCEL_APP_URL is not set."
+            echo "Add it in GitHub: Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
+          fi
 
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" "$VERCEL_APP_URL")
 
           if [ "$CODE" != "200" ]; then
-            echo "Frontend returned HTTP $CODE"
+            echo "Frontend returned HTTP $CODE for $VERCEL_APP_URL"
             exit 1
           fi
 
