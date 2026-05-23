@@ -1,0 +1,33 @@
+name: OWASP Dependency-Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan ${{ matrix.project }}
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: ${{ matrix.project }}
+          path: ${{ matrix.project }}
+          format: HTML
+          out: reports-${{ matrix.project }}
+          args: >
+            --failOnCVSS 7
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-${{ matrix.project }}
+          path: reports-${{ matrix.project }}
