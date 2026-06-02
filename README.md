@@ -18,7 +18,7 @@ git clone https://github.com/Qumaqwe/telegram-freelancing-app.git
 cd telegram-freelancing-app
 ```
 
-## 🛠 CI/CD and Automation
+## CI/CD and Automation
 
 The project has automated security and testing workflows configured via GitHub Actions. The following checks run automatically on every push or Pull Request:
 - **Dependency Check (`dependency-check.yml`):** Scans used dependencies and libraries for known vulnerabilities.

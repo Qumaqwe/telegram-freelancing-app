@@ -10,6 +10,7 @@ const { startScheduler } = require('./scheduler');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const WEBAPP_URL = process.env.WEBAPP_URL || 'http://localhost:5173';
+const BOT_ENABLED = process.env.BOT_ENABLED !== 'false';
 
 app.use(cors());
 app.use('/api', generalLimiter);
@@ -44,7 +45,7 @@ initDb()
   .then(() => {
     app.listen(PORT, () => console.log(`✅ Сервер запущен на порту ${PORT}`));
 
-    if (process.env.BOT_TOKEN) {
+    if (process.env.BOT_TOKEN && BOT_ENABLED) {
       const bot = createBot(WEBAPP_URL);
       botInstance.set(bot);
 
@@ -67,8 +68,10 @@ initDb()
       startScheduler(bot);
       process.once('SIGINT',  () => bot.stop('SIGINT'));
       process.once('SIGTERM', () => bot.stop('SIGTERM'));
-    } else {
+    } else if (!process.env.BOT_TOKEN) {
       console.warn('⚠️  BOT_TOKEN не указан');
+    } else {
+      console.warn('⚠️  Бот отключен: BOT_ENABLED=false');
     }
   })
   .catch((err) => {
