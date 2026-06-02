@@ -24,4 +24,4 @@ The project has automated security and testing workflows configured via GitHub A
 - **Dependency Check (`dependency-check.yml`):** Scans used dependencies and libraries for known vulnerabilities.
 - **Gitleaks (`gitleaks.yml`):** Scans the repository to detect accidentally committed secrets, API tokens, and credentials.
 - **Semgrep (`semgrep.yml`):** Static Application Security Testing (SAST) to find bugs and security vulnerabilities in the source code.
-- **Smoke Tests (`smoke-test.yml`):** Runs a basic suite of tests to verify the core functionality of the application after code changes.
+- **Smoke Tests (`smoke-test.yml`):** Runs a basic suite of tests to verify the core functionality of the application after code changes. 
